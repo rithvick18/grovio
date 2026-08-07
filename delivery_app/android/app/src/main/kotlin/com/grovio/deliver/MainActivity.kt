@@ -1,4 +1,4 @@
-package com.example.customer_app_ordering
+package com.grovio.deliver
 
 import io.flutter.embedding.android.FlutterActivity
 

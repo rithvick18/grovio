@@ -48,6 +48,20 @@ class InventoryUpdateRequest(BaseModel):
 class BulkInventoryUpdateRequest(BaseModel):
     updates: List[InventoryUpdateRequest]
 
+class AdminCreateInventoryItemRequest(BaseModel):
+    name: str
+    sku: Optional[str] = None
+    quantity: int = Field(ge=0)
+    price: float = Field(ge=0)
+    category: Optional[str] = "General"
+    store_id: Optional[str] = None
+
+class AdminUpdateInventoryItemRequest(BaseModel):
+    name: Optional[str] = None
+    quantity: Optional[int] = None
+    price: Optional[float] = None
+    category: Optional[str] = None
+
 # State Machine Validation
 ALLOWED_TRANSITIONS = {
     "pending": ["accepted", "cancelled"],
@@ -205,6 +219,29 @@ async def bulk_update_inventory(request: BulkInventoryUpdateRequest, supabase: C
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Bulk update failed: {str(e)}")
 
+@router.get("/inventory/stats")
+@router.get("/api/inventory/stats")
+async def get_inventory_stats(supabase: Client = Depends(get_supabase_client)):
+    """
+    Compute inventory stats: total_items, low_stock_count (< 10), and total_valuation.
+    """
+    try:
+        response = supabase.table("store_inventory").select("stock_count, price").execute()
+        data = response.data or []
+        total_items = len(data)
+        low_stock_count = sum(1 for item in data if (item.get("stock_count") or 0) < 10)
+        total_valuation = sum(
+            (item.get("stock_count") or 0) * (item.get("price") or 0.0)
+            for item in data
+        )
+        return {
+            "total_items": total_items,
+            "low_stock_count": low_stock_count,
+            "total_valuation": round(total_valuation, 2)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
 @router.get("/inventory")
 @router.get("/api/inventory")
 async def get_inventory(store_id: Optional[str] = None, supabase: Client = Depends(get_supabase_client)):
@@ -217,6 +254,114 @@ async def get_inventory(store_id: Optional[str] = None, supabase: Client = Depen
             query = query.eq("store_id", store_id)
             
         response = query.execute()
-        return response.data
+        raw_data = response.data or []
+        formatted = []
+        for item in raw_data:
+            product = item.get("products") or {}
+            formatted.append({
+                "id": item["id"],
+                "name": product.get("name") or "Unknown Product",
+                "sku": product.get("sku") or str(item.get("product_id", ""))[:8],
+                "quantity": item.get("stock_count", 0),
+                "price": item.get("price") if item.get("price") is not None else (product.get("price") or 0.0),
+                "category": product.get("category") or "General",
+                "store_id": item.get("store_id"),
+                "product_id": item.get("product_id"),
+                "stock_count": item.get("stock_count", 0),
+                "products": product
+            })
+        return formatted
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.post("/inventory")
+@router.post("/api/inventory")
+async def create_inventory_item(request: AdminCreateInventoryItemRequest, supabase: Client = Depends(get_supabase_client)):
+    """
+    Create a new inventory item and associated product for the admin portal.
+    """
+    try:
+        prod_res = supabase.table("products").select("*").eq("name", request.name).execute()
+        if prod_res.data:
+            product = prod_res.data[0]
+            product_id = product["id"]
+        else:
+            new_prod = {
+                "id": str(uuid.uuid4()),
+                "name": request.name,
+                "category": request.category or "General",
+                "price": request.price,
+                "sku": request.sku or str(uuid.uuid4())[:8]
+            }
+            inserted_prod = supabase.table("products").insert(new_prod).execute()
+            product_id = inserted_prod.data[0]["id"]
+        
+        store_id = request.store_id
+        if not store_id:
+            store_res = supabase.table("stores").select("id").limit(1).execute()
+            if store_res.data:
+                store_id = store_res.data[0]["id"]
+            else:
+                store_id = str(uuid.uuid4())
+
+        new_inv = {
+            "id": str(uuid.uuid4()),
+            "store_id": store_id,
+            "product_id": product_id,
+            "stock_count": request.quantity,
+            "price": request.price,
+            "is_available": True
+        }
+        inv_res = supabase.table("store_inventory").insert(new_inv).execute()
+        return inv_res.data[0]
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.put("/inventory/{id}")
+@router.put("/api/inventory/{id}")
+async def update_inventory_item(id: str, request: AdminUpdateInventoryItemRequest, supabase: Client = Depends(get_supabase_client)):
+    """
+    Update an inventory item's stock count, price, name, or category.
+    """
+    try:
+        inv_res = supabase.table("store_inventory").select("*, products(*)").eq("id", id).execute()
+        if not inv_res.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Inventory item not found")
+        
+        inv_item = inv_res.data[0]
+        updates = {}
+        if request.quantity is not None:
+            updates["stock_count"] = request.quantity
+        if request.price is not None:
+            updates["price"] = request.price
+        
+        if updates:
+            supabase.table("store_inventory").update(updates).eq("id", id).execute()
+            
+        if inv_item.get("product_id") and (request.name or request.category or request.price is not None):
+            prod_updates = {}
+            if request.name:
+                prod_updates["name"] = request.name
+            if request.category:
+                prod_updates["category"] = request.category
+            if request.price is not None:
+                prod_updates["price"] = request.price
+            supabase.table("products").update(prod_updates).eq("id", inv_item["product_id"]).execute()
+            
+        return {"message": "Item updated successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.delete("/inventory/{id}")
+@router.delete("/api/inventory/{id}")
+async def delete_inventory_item(id: str, supabase: Client = Depends(get_supabase_client)):
+    """
+    Delete an inventory item by ID.
+    """
+    try:
+        supabase.table("store_inventory").delete().eq("id", id).execute()
+        return {"message": "Item deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
