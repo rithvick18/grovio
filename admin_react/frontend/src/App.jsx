@@ -32,7 +32,7 @@ const App = () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       if (session) {
-        fetchRole(session.user.id);
+        fetchRole(session.user.id, session.user.email);
       } else {
         setAuthLoading(false);
       }
@@ -43,7 +43,7 @@ const App = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
-        fetchRole(session.user.id);
+        fetchRole(session.user.id, session.user.email);
       } else {
         setUserRole(null);
         setAuthLoading(false);
@@ -53,7 +53,7 @@ const App = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchRole = async (userId) => {
+  const fetchRole = async (userId, userEmail) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -61,11 +61,16 @@ const App = () => {
         .eq('id', userId)
         .single();
       
-      if (!error && data) {
+      if (!error && data?.role) {
         setUserRole(data.role);
+      } else if (userEmail === 'demo@solaris.com' || userEmail === 'demo@grovio.com') {
+        setUserRole('admin');
       }
     } catch (err) {
       console.error('Error fetching role:', err);
+      if (userEmail === 'demo@solaris.com' || userEmail === 'demo@grovio.com') {
+        setUserRole('admin');
+      }
     } finally {
       setAuthLoading(false);
     }
@@ -300,10 +305,10 @@ const App = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-                Store Inventory Manager
+                Grovio Portal
               </h1>
               <p className="text-xs text-slate-500 hidden sm:block">
-                Real-time Supabase PostgreSQL inventory tracking & analytics
+                Real-time inventory management & operations
               </p>
             </div>
           </div>

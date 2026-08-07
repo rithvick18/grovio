@@ -270,6 +270,6 @@ class SupabaseService {
         .from('orders')
         .stream(primaryKey: ['id'])
         .eq('id', orderId)
-        .map((event) => (event as List).first);
+        .map((event) => (event as List).isEmpty ? <String, dynamic>{} : (event as List).first);
   }
 }

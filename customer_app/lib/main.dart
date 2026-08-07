@@ -9,18 +9,22 @@ import 'views/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SupabaseService.initialize();
-  runApp(const SolarisGroceryApp());
+  try {
+    await SupabaseService.initialize();
+  } catch (e) {
+    debugPrint('[main] SupabaseService.initialize error: $e');
+  }
+  runApp(const GrovioOrderApp());
 }
 
-class SolarisGroceryApp extends StatefulWidget {
-  const SolarisGroceryApp({super.key});
+class GrovioOrderApp extends StatefulWidget {
+  const GrovioOrderApp({super.key});
 
   @override
-  State<SolarisGroceryApp> createState() => _SolarisGroceryAppState();
+  State<GrovioOrderApp> createState() => _GrovioOrderAppState();
 }
 
-class _SolarisGroceryAppState extends State<SolarisGroceryApp> {
+class _GrovioOrderAppState extends State<GrovioOrderApp> {
   late final CartProvider _cartProvider;
   late final AuthProvider _authProvider;
 
@@ -44,7 +48,7 @@ class _SolarisGroceryAppState extends State<SolarisGroceryApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Solaris Gold Grocery',
+      title: 'Grovio Order',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: AuthGate(

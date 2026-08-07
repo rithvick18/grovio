@@ -312,7 +312,7 @@ class CheckoutScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Apple Pay •••• 4920', style: AppTypography.titleMd.copyWith(fontSize: 15)),
-                              Text('Solaris Gold Rewards Applied', style: AppTypography.bodySm.copyWith(fontSize: 12)),
+                              Text('Grovio Rewards Applied', style: AppTypography.bodySm.copyWith(fontSize: 12)),
                             ],
                           ),
                         ),

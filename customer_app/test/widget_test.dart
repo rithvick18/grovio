@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:customer_app_ordering/main.dart';
+import 'package:grovio_order/main.dart';
 
 void main() {
-  testWidgets('SolarisGroceryApp renders main navigation', (WidgetTester tester) async {
+  testWidgets('GrovioOrderApp renders main navigation', (WidgetTester tester) async {
     TestWidgetsFlutterBinding.ensureInitialized();
     try {
       await Supabase.initialize(
@@ -12,7 +12,7 @@ void main() {
       );
     } catch (_) {}
 
-    await tester.pumpWidget(const SolarisGroceryApp());
-    expect(find.byType(SolarisGroceryApp), findsOneWidget);
+    await tester.pumpWidget(const GrovioOrderApp());
+    expect(find.byType(GrovioOrderApp), findsOneWidget);
   });
 }

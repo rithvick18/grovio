@@ -10,18 +10,22 @@ import 'views/shopper_onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SupabaseService.initialize();
-  runApp(const SolarisDeliveryApp());
+  try {
+    await SupabaseService.initialize();
+  } catch (e) {
+    debugPrint('[main] SupabaseService.initialize error: $e');
+  }
+  runApp(const GrovioDeliverApp());
 }
 
-class SolarisDeliveryApp extends StatefulWidget {
-  const SolarisDeliveryApp({super.key});
+class GrovioDeliverApp extends StatefulWidget {
+  const GrovioDeliverApp({super.key});
 
   @override
-  State<SolarisDeliveryApp> createState() => _SolarisDeliveryAppState();
+  State<GrovioDeliverApp> createState() => _GrovioDeliverAppState();
 }
 
-class _SolarisDeliveryAppState extends State<SolarisDeliveryApp> {
+class _GrovioDeliverAppState extends State<GrovioDeliverApp> {
   late final AuthProvider _authProvider;
   late final DeliveryProvider _deliveryProvider;
 
@@ -51,7 +55,7 @@ class _SolarisDeliveryAppState extends State<SolarisDeliveryApp> {
         ChangeNotifierProvider.value(value: _deliveryProvider),
       ],
       child: MaterialApp(
-        title: 'Solaris Gold Delivery Partner',
+        title: 'Grovio Deliver',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         home: Consumer<AuthProvider>(
@@ -63,7 +67,7 @@ class _SolarisDeliveryAppState extends State<SolarisDeliveryApp> {
             }
 
             if (!auth.isAuthenticated) {
-              return const LoginScreen();
+              return LoginScreen(authProvider: auth);
             }
 
             if (!auth.isOnboarded) {

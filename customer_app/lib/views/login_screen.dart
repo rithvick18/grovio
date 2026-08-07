@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
 
                   Text(
-                    'Welcome to Solaris Gold',
+                    'Welcome to Grovio Order',
                     style: AppTypography.headlineMobile.copyWith(
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
@@ -149,6 +149,62 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ],
+
+                    // Quick Demo Access Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton(
+                      onPressed: auth.isLoading
+                          ? null
+                          : () async {
+                              final navigator = Navigator.of(context);
+                              final success = await auth.signInWithDemo();
+                              if (success && mounted) {
+                                if (widget.onSuccess != null) {
+                                  widget.onSuccess!();
+                                } else {
+                                  navigator.pop();
+                                }
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 3,
+                        shadowColor: AppColors.primary.withValues(alpha: 0.3),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                      ),
+                      child: auth.isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.flash_on_rounded, color: Colors.white, size: 22),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Quick Demo Access',
+                                  style: AppTypography.titleMd.copyWith(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
 
                   // Continue with Google Button
                   SizedBox(

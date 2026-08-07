@@ -50,7 +50,7 @@ class ReplacementPreferencesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Solaris Gold Preferences',
+              'Grovio Order Preferences',
               style: AppTypography.labelCaps.copyWith(color: AppColors.primary),
             ),
             Text(

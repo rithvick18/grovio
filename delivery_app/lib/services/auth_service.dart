@@ -55,6 +55,20 @@ class AuthService {
     }
   }
 
+  Future<AuthResponse?> signInWithDemo() async {
+    try {
+      return await _supabase.auth.signInWithPassword(
+        email: 'demo@grovio.com',
+        password: 'DemoUser123!',
+      );
+    } catch (_) {
+      return await _supabase.auth.signInWithPassword(
+        email: 'demo@solaris.com',
+        password: 'DemoUser123!',
+      );
+    }
+  }
+
   Future<void> signOut() async {
     try {
       final googleSignIn = GoogleSignIn();

@@ -41,7 +41,7 @@ class DriverProfileModel {
   static DriverProfileModel get sampleDriver => DriverProfileModel(
     id: 'drv_7749',
     name: 'Alex Rivera',
-    email: 'alex.rivera@solarisdelivery.com',
+    email: 'alex.rivera@groviodelivery.com',
     phone: '+1 (555) 438-9920',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&fit=crop',
     rating: 4.94,

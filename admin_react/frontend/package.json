@@ -1,5 +1,5 @@
 {
-  "name": "store-inventory-frontend",
+  "name": "grovio-portal",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/supabase-js": "^2.112.2",
     "axios": "^1.6.8",
     "lucide-react": "^0.359.0",
     "react": "^18.2.0",

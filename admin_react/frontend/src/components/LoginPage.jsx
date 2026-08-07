@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Store } from 'lucide-react';
+import { Store, Zap } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   const handleLogin = async () => {
     setIsLoading(true);
+    setErrorMsg(null);
     try {
       await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -14,7 +17,34 @@ const LoginPage = () => {
       });
     } catch (error) {
       console.error('Error logging in:', error);
+      setErrorMsg(error.message);
       setIsLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true);
+    setErrorMsg(null);
+    try {
+      let { error } = await supabase.auth.signInWithPassword({
+        email: 'demo@grovio.com',
+        password: 'DemoUser123!',
+      });
+      if (error) {
+        const fallback = await supabase.auth.signInWithPassword({
+          email: 'demo@solaris.com',
+          password: 'DemoUser123!',
+        });
+        error = fallback.error;
+      }
+      if (error) {
+        setErrorMsg(error.message);
+      }
+    } catch (error) {
+      console.error('Error logging in with demo account:', error);
+      setErrorMsg(error.message);
+    } finally {
+      setIsDemoLoading(false);
     }
   };
 
@@ -27,19 +57,46 @@ const LoginPage = () => {
           </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 tracking-tight">
-          Admin Dashboard
+          Grovio Portal
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600">
-          Sign in to access the store inventory manager
+          Sign in to access store inventory & management
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-xl shadow-slate-200/50 sm:rounded-2xl sm:px-10 border border-slate-100">
-          <div className="space-y-6">
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl">
+              {errorMsg}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <button
+              onClick={handleDemoLogin}
+              disabled={isDemoLoading || isLoading}
+              className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isDemoLoading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Authenticating...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 fill-current" />
+                  Quick Demo Access
+                </span>
+              )}
+            </button>
+
             <button
               onClick={handleLogin}
-              disabled={isLoading}
+              disabled={isLoading || isDemoLoading}
               className="w-full flex justify-center py-3 px-4 border border-slate-300 rounded-xl shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (

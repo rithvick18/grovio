@@ -93,7 +93,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  'Solaris Driver',
+                  'Grovio Deliver',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

@@ -9,6 +9,8 @@ import '../services/auth_service.dart';
 class DeliveryProvider extends ChangeNotifier {
   final SupabaseService _supabaseService = SupabaseService();
   final AuthService _authService = AuthService();
+  StreamSubscription<List<Map<String, dynamic>>>? _ordersSubscription;
+  bool _isDisposed = false;
   DriverProfileModel _driver = DriverProfileModel.sampleDriver;
   List<DeliveryOrderModel> _availableOrders = [];
   final List<DeliveryOrderModel> _completedOrders = [];
@@ -135,8 +137,10 @@ class DeliveryProvider extends ChangeNotifier {
   }
 
   void _setupRealtimeOrders() {
-    _supabaseService.streamAvailableOrders().listen(
+    _ordersSubscription?.cancel();
+    _ordersSubscription = _supabaseService.streamAvailableOrders().listen(
       (ordersData) {
+        if (_isDisposed) return;
         final newOrders = ordersData
             .map((data) => DeliveryOrderModel.fromMap(data))
             .toList();
@@ -148,6 +152,7 @@ class DeliveryProvider extends ChangeNotifier {
         }
       },
       onError: (error) {
+        if (_isDisposed) return;
         _errorMessage = 'Realtime orders error: ${error.toString()}';
         debugPrint('[DeliveryProvider._setupRealtimeOrders] Error: $error');
       },
@@ -412,5 +417,18 @@ class DeliveryProvider extends ChangeNotifier {
     _availableOrders = List.from(DeliveryOrderModel.sampleOrders);
     _driver = DriverProfileModel.sampleDriver;
     notifyListeners();
+  }
+
+  @override
+  void notifyListeners() {
+    if (_isDisposed) return;
+    super.notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _ordersSubscription?.cancel();
+    super.dispose();
   }
 }

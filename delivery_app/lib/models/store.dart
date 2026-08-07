@@ -1,4 +1,4 @@
-/// Model representing a grocery store in Solaris Gold.
+/// Model representing a grocery store in Grovio.
 class StoreModel {
   final String id;
   final String name;
@@ -10,8 +10,7 @@ class StoreModel {
   final String imageUrl;
   final bool isPrimary;
   final bool isOpen;
-  final List<String>
-  tags; // e.g., ['Organic', 'Live Stock Tracking', 'Pickup Available']
+  final List<String> tags; // e.g., ['Organic', 'Live Stock Tracking', 'Pickup Available']
 
   const StoreModel({
     required this.id,
@@ -51,7 +50,7 @@ class StoreModel {
 
     return StoreModel(
       id: map['id']?.toString() ?? '',
-      name: map['name']?.toString() ?? 'Solaris Store',
+      name: map['name']?.toString() ?? 'Grovio Store',
       address: map['address']?.toString() ?? 'Springfield',
       distanceMiles: distance,
       pickupTimeMins: (map['pickup_time_mins'] as num?)?.toInt() ?? 15,
@@ -68,7 +67,7 @@ class StoreModel {
   static List<StoreModel> get sampleStores => const [
     StoreModel(
       id: 'store_1',
-      name: 'Solaris Supercenter',
+      name: 'Grovio Supercenter',
       address: '742 Evergreen Terrace, Springfield',
       distanceMiles: 0.8,
       pickupTimeMins: 15,
@@ -87,7 +86,7 @@ class StoreModel {
     ),
     StoreModel(
       id: 'store_2',
-      name: 'Solaris Market & Bakery',
+      name: 'Grovio Market & Bakery',
       address: '120 Oakridge Blvd, Springfield',
       distanceMiles: 1.5,
       pickupTimeMins: 20,
@@ -101,7 +100,7 @@ class StoreModel {
     ),
     StoreModel(
       id: 'store_3',
-      name: 'Solaris Organic Express',
+      name: 'Grovio Organic Express',
       address: '405 Pine Street, Springfield',
       distanceMiles: 2.3,
       pickupTimeMins: 25,

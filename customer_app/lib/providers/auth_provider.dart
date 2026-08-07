@@ -79,6 +79,9 @@ class AuthProvider extends ChangeNotifier {
       } else {
         _profile = profileData;
       }
+      if (user.email == 'demo@solaris.com' || user.email == 'demo@grovio.com') {
+        _profile!['is_onboarded'] = true;
+      }
     } catch (e) {
       print('[AuthProvider._syncUserProfile] Profile upsert notice: $e');
       _profile = {
@@ -87,6 +90,9 @@ class AuthProvider extends ChangeNotifier {
         'full_name': user.userMetadata?['full_name'] ?? user.userMetadata?['name'] ?? user.email?.split('@').first,
         'avatar_url': user.userMetadata?['avatar_url'] ?? user.userMetadata?['picture'],
       };
+      if (user.email == 'demo@solaris.com' || user.email == 'demo@grovio.com') {
+        _profile!['is_onboarded'] = true;
+      }
     }
     notifyListeners();
   }
@@ -102,10 +108,35 @@ class AuthProvider extends ChangeNotifier {
 
       if (response != null) {
         _profile = Map<String, dynamic>.from(response);
+        if (_user?.email == 'demo@solaris.com' || _user?.email == 'demo@grovio.com') {
+          _profile!['is_onboarded'] = true;
+        }
         notifyListeners();
       }
     } catch (e) {
       print('[AuthProvider.refreshProfile] Error: $e');
+    }
+  }
+
+  Future<bool> signInWithDemo() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _authService.signInWithDemo();
+      if (response?.user != null) {
+        _user = response!.user;
+        await _syncUserProfile(_user!);
+      }
+      _isLoading = false;
+      notifyListeners();
+      return isAuthenticated;
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
     }
   }
 

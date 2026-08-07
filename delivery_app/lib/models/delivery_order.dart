@@ -192,9 +192,9 @@ class DeliveryOrderModel {
   static List<DeliveryOrderModel> get sampleOrders => [
     DeliveryOrderModel(
       id: 'order_101',
-      orderNumber: '#SOL-8921',
+      orderNumber: '#GROV-8921',
       storeId: 'store_1',
-      storeName: 'Solaris Supercenter',
+      storeName: 'Grovio Supercenter',
       storeAddress: '742 Evergreen Terrace, Springfield',
       storeImageUrl:
           'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=400&fit=crop',
@@ -253,9 +253,9 @@ class DeliveryOrderModel {
     ),
     DeliveryOrderModel(
       id: 'order_102',
-      orderNumber: '#SOL-8924',
+      orderNumber: '#GROV-8924',
       storeId: 'store_2',
-      storeName: 'Solaris Market & Bakery',
+      storeName: 'Grovio Market & Bakery',
       storeAddress: '120 Oakridge Blvd, Springfield',
       storeImageUrl:
           'https://images.unsplash.com/photo-1517523791225-289075439574?w=400&h=400&fit=crop',
@@ -304,9 +304,9 @@ class DeliveryOrderModel {
     ),
     DeliveryOrderModel(
       id: 'order_103',
-      orderNumber: '#SOL-8930',
+      orderNumber: '#GROV-8930',
       storeId: 'store_3',
-      storeName: 'Solaris Organic Express',
+      storeName: 'Grovio Organic Express',
       storeAddress: '405 Pine Street, Springfield',
       storeImageUrl:
           'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',

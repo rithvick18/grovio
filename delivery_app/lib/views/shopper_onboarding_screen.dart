@@ -98,21 +98,21 @@ class _ShopperOnboardingScreenState extends State<ShopperOnboardingScreen> {
                 const SizedBox(height: 32),
                 Text(
                   'Complete Your Profile',
-                  style: AppTypography.h1,
+                  style: AppTypography.headlineLg,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Tell us a bit about yourself to start delivering.',
-                  style: AppTypography.bodyText.copyWith(
-                    color: AppColors.textSecondary,
+                  style: AppTypography.bodyMd.copyWith(
+                    color: AppColors.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 48),
                 Text(
                   'Phone Number',
-                  style: AppTypography.h3,
+                  style: AppTypography.titleMd,
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -122,17 +122,17 @@ class _ShopperOnboardingScreenState extends State<ShopperOnboardingScreen> {
                     hintText: 'Enter your phone number',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: const BorderSide(color: AppColors.outlineVariant),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: const BorderSide(color: AppColors.outlineVariant),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: AppColors.primary),
                     ),
-                    prefixIcon: const Icon(Icons.phone, color: AppColors.textSecondary),
+                    prefixIcon: const Icon(Icons.phone, color: AppColors.onSurfaceVariant),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -144,32 +144,32 @@ class _ShopperOnboardingScreenState extends State<ShopperOnboardingScreen> {
                 const SizedBox(height: 24),
                 Text(
                   'Vehicle Type',
-                  style: AppTypography.h3,
+                  style: AppTypography.titleMd,
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  value: _vehicleType,
+                  initialValue: _vehicleType,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: const BorderSide(color: AppColors.outlineVariant),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: const BorderSide(color: AppColors.outlineVariant),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: AppColors.primary),
                     ),
-                    prefixIcon: const Icon(Icons.two_wheeler, color: AppColors.textSecondary),
+                    prefixIcon: const Icon(Icons.two_wheeler, color: AppColors.onSurfaceVariant),
                   ),
                   items: _vehicleOptions.map((type) {
                     return DropdownMenuItem(
                       value: type,
                       child: Text(
                         type[0].toUpperCase() + type.substring(1),
-                        style: AppTypography.bodyText,
+                        style: AppTypography.bodyMd,
                       ),
                     );
                   }).toList(),
@@ -186,7 +186,7 @@ class _ShopperOnboardingScreenState extends State<ShopperOnboardingScreen> {
                     onPressed: _isLoading ? null : _submit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.textLight,
+                      foregroundColor: AppColors.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -197,14 +197,14 @@ class _ShopperOnboardingScreenState extends State<ShopperOnboardingScreen> {
                             height: 24,
                             width: 24,
                             child: CircularProgressIndicator(
-                              color: AppColors.textLight,
+                              color: AppColors.onPrimary,
                               strokeWidth: 2,
                             ),
                           )
                         : Text(
                             'Complete Profile',
-                            style: AppTypography.h3.copyWith(
-                              color: AppColors.textLight,
+                            style: AppTypography.titleMd.copyWith(
+                              color: AppColors.onPrimary,
                             ),
                           ),
                   ),

@@ -178,9 +178,9 @@ def generate_store_data() -> tuple[List[Dict[str, Any]], Dict[int, str]]:
     """Generate 10 store records."""
     stores = []
     store_names = [
-        "Solaris Supercenter",
-        "Solaris Market & Bakery",
-        "Solaris Organic Express",
+        "Grovio Supercenter",
+        "Grovio Market & Bakery",
+        "Grovio Organic Express",
         "FreshMart Grocery",
         "Green Valley Market",
         "Harvest Foods",
