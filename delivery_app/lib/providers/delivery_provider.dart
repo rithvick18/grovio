@@ -104,7 +104,7 @@ class DeliveryProvider extends ChangeNotifier {
               (profileData['acceptance_rate'] as num?)?.toDouble() ?? 95.0,
           completionRate:
               (profileData['completion_rate'] as num?)?.toDouble() ?? 98.0,
-          isOnline: profileData['is_online'] ?? false,
+          isOnline: profileData['is_online'] ?? true,
           vehicleType: _parseVehicleType(
             profileData['vehicle_type']?.toString(),
           ),
@@ -171,19 +171,21 @@ class DeliveryProvider extends ChangeNotifier {
 
   Future<void> toggleOnlineStatus() async {
     try {
+      bool newStatus = !_driver.isOnline;
+      _driver.isOnline = newStatus;
+      _errorMessage = null;
+
       final user = _authService.currentUser;
       if (user != null) {
-        bool newStatus = !_driver.isOnline;
         bool success = await _supabaseService.updateDriverOnlineStatus(
           user.id,
           newStatus,
         );
 
-        if (success) {
-          _driver.isOnline = newStatus;
-          _errorMessage = null;
-        } else {
-          _errorMessage = 'Failed to update online status';
+        if (!success) {
+          debugPrint(
+            '[DeliveryProvider.toggleOnlineStatus] Warning: Failed to update online status on server',
+          );
         }
       }
     } catch (e) {
