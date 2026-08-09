@@ -20,6 +20,9 @@ const ItemForm = ({ onSubmit, editingItem, onCancelEdit, submitting, backendConn
     quantity: 0,
     price: 0.0,
     category: 'General',
+    unit: 'ea',
+    image_url: '',
+    aisle_location: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -32,6 +35,9 @@ const ItemForm = ({ onSubmit, editingItem, onCancelEdit, submitting, backendConn
         quantity: editingItem.quantity ?? 0,
         price: editingItem.price ?? 0.0,
         category: editingItem.category || 'General',
+        unit: editingItem.products?.unit || editingItem.unit || 'ea',
+        image_url: editingItem.products?.image_url || editingItem.image_url || '',
+        aisle_location: editingItem.products?.aisle_location || editingItem.aisle_location || '',
       });
       setErrors({});
     } else {
@@ -46,6 +52,9 @@ const ItemForm = ({ onSubmit, editingItem, onCancelEdit, submitting, backendConn
       quantity: 0,
       price: 0.0,
       category: 'General',
+      unit: 'ea',
+      image_url: '',
+      aisle_location: '',
     });
     setErrors({});
   };
@@ -97,6 +106,9 @@ const ItemForm = ({ onSubmit, editingItem, onCancelEdit, submitting, backendConn
       quantity: parseInt(formData.quantity, 10),
       price: parseFloat(formData.price),
       category: formData.category.trim() || 'General',
+      unit: formData.unit,
+      image_url: formData.image_url,
+      aisle_location: formData.aisle_location,
     };
 
     onSubmit(payload, editingItem ? editingItem.id : null, resetForm);
@@ -245,6 +257,61 @@ const ItemForm = ({ onSubmit, editingItem, onCancelEdit, submitting, backendConn
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label htmlFor="unit" className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+              Unit
+            </label>
+            <input
+              type="text"
+              id="unit"
+              name="unit"
+              value={formData.unit}
+              onChange={handleChange}
+              disabled={!backendConnected}
+              className={`w-full bg-white border border-slate-300 focus:border-indigo-500 rounded-lg px-3.5 py-2.5 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors ${
+                !backendConnected ? 'cursor-not-allowed bg-slate-50' : ''
+              }`}
+              placeholder="ea, kg, etc."
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="aisle_location" className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+              Aisle Location
+            </label>
+            <input
+              type="text"
+              id="aisle_location"
+              name="aisle_location"
+              value={formData.aisle_location}
+              onChange={handleChange}
+              disabled={!backendConnected}
+              className={`w-full bg-white border border-slate-300 focus:border-indigo-500 rounded-lg px-3.5 py-2.5 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors ${
+                !backendConnected ? 'cursor-not-allowed bg-slate-50' : ''
+              }`}
+              placeholder="e.g. Aisle 1"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="image_url" className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+            Image URL
+          </label>
+          <input
+            type="text"
+            id="image_url"
+            name="image_url"
+            value={formData.image_url}
+            onChange={handleChange}
+            disabled={!backendConnected}
+            className={`w-full bg-white border border-slate-300 focus:border-indigo-500 rounded-lg px-3.5 py-2.5 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors ${
+              !backendConnected ? 'cursor-not-allowed bg-slate-50' : ''
+            }`}
+            placeholder="https://..."
+          />
         </div>
 
         {/* Submit & Action Buttons */}
