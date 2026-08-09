@@ -55,6 +55,9 @@ class AdminCreateInventoryItemRequest(BaseModel):
     price: float = Field(ge=0)
     category: Optional[str] = "General"
     store_id: Optional[str] = None
+    unit: Optional[str] = "ea"
+    image_url: Optional[str] = None
+    aisle_location: Optional[str] = None
 
 class AdminUpdateInventoryItemRequest(BaseModel):
     name: Optional[str] = None
@@ -290,8 +293,10 @@ async def create_inventory_item(request: AdminCreateInventoryItemRequest, supaba
                 "id": str(uuid.uuid4()),
                 "name": request.name,
                 "category": request.category or "General",
-                "price": request.price,
-                "sku": request.sku or str(uuid.uuid4())[:8]
+                "sku": request.sku or str(uuid.uuid4())[:8],
+                "unit": request.unit if getattr(request, "unit", None) else "ea",
+                "image_url": request.image_url if getattr(request, "image_url", None) else "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop",
+                "aisle_location": request.aisle_location if getattr(request, "aisle_location", None) else "Aisle 1 - Shelf A"
             }
             inserted_prod = supabase.table("products").insert(new_prod).execute()
             product_id = inserted_prod.data[0]["id"]
