@@ -210,7 +210,10 @@ class CartProvider extends ChangeNotifier {
     }).toList();
 
     try {
-      final userId = _supabaseService.client.auth.currentUser?.id ?? '00000000-0000-0000-0000-000000000001';
+      final userId = _supabaseService.client.auth.currentUser?.id;
+      if (userId == null) {
+        throw Exception('Please sign in to place an order.');
+      }
       final totalAmount = items.fold<double>(0.0, (sum, i) => sum + ((i['price'] as double) * (i['quantity'] as int)));
 
       final orderRes = await _supabaseService.client.from('orders').insert({
