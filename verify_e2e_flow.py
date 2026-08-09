@@ -7,7 +7,7 @@ def main():
 
     # Actually run the test_e2e.py which is now in store_portal/backend
 
-    cmd = ['python3', 'test_e2e.py']
+    cmd = ['./venv/bin/python', 'test_e2e.py']
     process = subprocess.Popen(cmd, cwd='store_portal/backend', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     for line in iter(process.stdout.readline, ''):
         print(line.strip())

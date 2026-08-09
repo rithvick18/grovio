@@ -161,7 +161,7 @@ const App = () => {
     }
   }, [connectionError]);
 
-  // Initial data fetch and connection check
+  // Initial data fetch, connection check & real-time inventory subscription
   useEffect(() => {
     fetchData();
 
@@ -170,7 +170,26 @@ const App = () => {
       checkBackendConnection();
     }, 30000); // Check every 30 seconds
 
-    return () => clearInterval(connectionCheckInterval);
+    // Subscribe to real-time database changes on store_inventory and orders
+    const inventoryChannel = supabase
+      .channel('public:store_inventory')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'store_inventory' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
+    const ordersChannel = supabase
+      .channel('public:orders')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+        fetchData();
+      })
+      .subscribe();
+
+    return () => {
+      clearInterval(connectionCheckInterval);
+      supabase.removeChannel(inventoryChannel);
+      supabase.removeChannel(ordersChannel);
+    };
   }, [fetchData]);
 
   // Add / Update item handler

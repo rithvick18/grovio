@@ -4,8 +4,6 @@ import '../models/product.dart';
 import '../models/live_order.dart';
 import '../models/replacement_preference.dart';
 import '../services/supabase_service.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 /// Central state provider managing cart items, store selection, live order state, and replacement preferences.
 class CartProvider extends ChangeNotifier {
@@ -197,7 +195,13 @@ class CartProvider extends ChangeNotifier {
     if (_cartQuantities.isEmpty) return;
 
     final items = _cartQuantities.entries.map((e) {
-      final product = _products.firstWhere((p) => p.id == e.key);
+      final product = _products.firstWhere(
+        (p) => p.id == e.key,
+        orElse: () => ProductModel.sampleProducts.firstWhere(
+          (p) => p.id == e.key,
+          orElse: () => _products.isNotEmpty ? _products.first : ProductModel.sampleProducts.first,
+        ),
+      );
       return {
         'product_id': e.key,
         'quantity': e.value,
@@ -206,27 +210,54 @@ class CartProvider extends ChangeNotifier {
     }).toList();
 
     try {
-      final token = _supabaseService.client.auth.currentSession?.accessToken;
-      final response = await http.post(
-        Uri.parse('http://localhost:8000/orders/checkout'),
-        headers: {
-          'Content-Type': 'application/json',
-          if (token != null) 'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'store_id': _selectedStore.id,
-          'items': items,
-        }),
-      );
-      if (response.statusCode == 201) {
-        _hasActiveOrder = true;
-        _cartQuantities.clear();
-        notifyListeners();
-      } else {
-        print('Error placing order: ${response.body}');
+      final userId = _supabaseService.client.auth.currentUser?.id ?? '00000000-0000-0000-0000-000000000001';
+      final totalAmount = items.fold<double>(0.0, (sum, i) => sum + ((i['price'] as double) * (i['quantity'] as int)));
+
+      final orderRes = await _supabaseService.client.from('orders').insert({
+        'customer_id': userId,
+        'store_id': _selectedStore.id,
+        'status': 'pending',
+        'total_amount': totalAmount,
+      }).select('id').single();
+
+      final orderId = orderRes['id'];
+      final orderItemsData = items.map((i) => {
+        'order_id': orderId,
+        'product_id': i['product_id'],
+        'quantity': i['quantity'],
+        'price_at_order': i['price'],
+      }).toList();
+
+      await _supabaseService.client.from('order_items').insert(orderItemsData);
+
+      for (final item in items) {
+        final prodId = item['product_id'] as String;
+        final qty = item['quantity'] as int;
+
+        final invRes = await _supabaseService.client
+            .from('store_inventory')
+            .select('stock_count')
+            .eq('store_id', _selectedStore.id)
+            .eq('product_id', prodId)
+            .maybeSingle();
+
+        if (invRes != null) {
+          final currentStock = (invRes['stock_count'] as int?) ?? 0;
+          final newStock = (currentStock - qty).clamp(0, 999999);
+          await _supabaseService.client
+              .from('store_inventory')
+              .update({'stock_count': newStock})
+              .eq('store_id', _selectedStore.id)
+              .eq('product_id', prodId);
+        }
       }
-    } catch (e) {
-      print('Network error placing order: $e');
+      
+      print('[CartProvider.placeOrder] Direct Supabase checkout succeeded');
+      _hasActiveOrder = true;
+      _cartQuantities.clear();
+      notifyListeners();
+    } catch (e, st) {
+      print('[CartProvider.placeOrder] Direct Supabase checkout failed: $e\n$st');
     }
   }
 

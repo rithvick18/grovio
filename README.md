@@ -26,7 +26,7 @@ This repository is structured as a monorepo housing the mobile applications, web
 
 ### 1. Customer Ordering App (`customer_app/`)
 * **Technology**: Flutter (Dart)
-* **Description**: Cross-platform mobile app enabling customers to browse products and store categories, manage carts, place orders, and track order fulfillment status in real time.
+* **Description**: Cross-platform mobile app enabling customers to browse products and store categories, manage carts, place orders, and track order fulfillment status in real time. Communicates directly with Supabase via the Supabase SDK for all data operations (bypassing the backend REST API).
 * **Key Dependencies**: `supabase_flutter`, `google_fonts`, `cached_network_image`.
 
 ### 2. Delivery Partner App (`delivery_app/`)
@@ -40,7 +40,7 @@ This repository is structured as a monorepo housing the mobile applications, web
   * **Description**: Web application for store managers to monitor live incoming orders, manage product catalog & inventory levels, onboard stores, and analyze sales.
 * **Store Portal Backend (`store_portal/backend/`)**
   * **Technology**: Python 3, FastAPI, Uvicorn, Pydantic, PyJWT, Supabase SDK
-  * **Description**: REST API backend server providing order state transitions, authentication management, and automated backend workflow handlers. Includes end-to-end test suite (`test_e2e.py`).
+  * **Description**: REST API backend server exclusively supporting the Store Portal Frontend. Note: The mobile apps (`customer_app`, `delivery_app`) do not depend on this backend and instead connect directly to Supabase. Includes end-to-end test suite (`test_e2e.py`).
 
 ### 4. Supabase Database (`supabase/`)
 * **Technology**: PostgreSQL / Supabase
@@ -97,5 +97,5 @@ flutter run
 To verify the API and database integration flow across store management and ordering workflows, run the root verification script:
 
 ```bash
-python3 verify_e2e_flow.py
+./store_portal/backend/venv/bin/python verify_e2e_flow.py
 ```
