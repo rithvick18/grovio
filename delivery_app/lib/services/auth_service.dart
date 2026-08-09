@@ -62,10 +62,17 @@ class AuthService {
         password: 'DemoUser123!',
       );
     } catch (_) {
-      return await _supabase.auth.signInWithPassword(
-        email: 'demo@solaris.com',
-        password: 'DemoUser123!',
-      );
+      try {
+        return await _supabase.auth.signInWithPassword(
+          email: 'demo@solaris.com',
+          password: 'DemoUser123!',
+        );
+      } catch (_) {
+        return await _supabase.auth.signInWithPassword(
+          email: 'shopper@grovio.app',
+          password: 'password123',
+        );
+      }
     }
   }
 

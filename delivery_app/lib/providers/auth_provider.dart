@@ -64,7 +64,6 @@ class AuthProvider extends ChangeNotifier {
         'email': user.email,
         'full_name': fullName,
         'avatar_url': avatarUrl,
-        'updated_at': DateTime.now().toIso8601String(),
       };
 
       // Automatically upsert user profile into public.profiles

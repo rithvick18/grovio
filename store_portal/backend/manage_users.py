@@ -22,6 +22,18 @@ for p in res.data:
 
 users_to_create = [
     {
+        "email": "demo@grovio.com",
+        "password": "DemoUser123!",
+        "role": "customer",
+        "name": "Demo User"
+    },
+    {
+        "email": "demo@solaris.com",
+        "password": "DemoUser123!",
+        "role": "customer",
+        "name": "Solaris Demo"
+    },
+    {
         "email": "customer@grovio.app",
         "password": "password123",
         "role": "customer",
